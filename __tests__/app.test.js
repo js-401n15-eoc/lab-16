@@ -1,5 +1,5 @@
 const alterFile = require('../alter-file.js');
-const logger = require('../logger.js');
+const { logger, errLogger } = require('../logger.js');
 
 describe('logger', () => {
   it('can display the event, time, and payload', () => {
@@ -9,8 +9,11 @@ describe('logger', () => {
     expect(res.payload).toBe(testFile);
     expect(!!res.time).toBe(true);
   });
-});
 
-// describe('alterFile', () => {
-//   it('it can edit a file')
-// });
+  it('can catch an error', () => {
+    const testFile = `${__dirname}/files/test-scratch.txt`;
+    const expectedRes = `error writing to file: ${testFile}`;
+    const res = errLogger('error', testFile);
+    expect(res).toBe(expectedRes);
+  });
+});
