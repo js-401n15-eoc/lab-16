@@ -2,17 +2,32 @@
 
 const events = require('./events.js');
 const fs = require('fs');
-const file = `${__dirname}/files/chicken-scratch.txt`;
+const util = require('util');
+const read = util.promisify(fs.readFile);
+const write = util.promisify(fs.writeFile);
 
-function alterFile(input) {
-  fs.readFile( file, (err, data) => {
-    if(err) { throw err; }
-    let text = (data + input).toString().toUpperCase();
-    fs.writeFile( file, Buffer.from(text), (err, data) => {
-      if(err) { throw err; }
-      console.log(`${file} saved successfully!`);
-    });
-  });
+const upperCaseContents = (buffer) => {
+  return Buffer.from(buffer.toString().trim().toUpperCase());
 };
 
-events.on('save', alterFile);
+const saveFile = (file, buffer) => {
+  return write(file, buffer);
+};
+
+const ok = (file) => {
+  events.emit('save', file);
+};
+
+const err = (error) => {
+  events.emit('error', error);
+};
+
+const alterFile = (file) => {
+  read(file)
+    .then(upperCaseContents)
+    .then(buffer => saveFile(file, buffer))
+    .then(() => ok(file))
+    .catch(err);
+};
+
+module.exports = alterFile;
