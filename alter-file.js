@@ -10,10 +10,6 @@ const upperCaseContents = (buffer) => {
   return Buffer.from(buffer.toString().trim().toUpperCase());
 };
 
-const saveFile = (file, buffer) => {
-  return write(file, buffer);
-};
-
 const ok = (file) => {
   events.emit('save', file);
 };
@@ -25,9 +21,9 @@ const err = (error) => {
 const alterFile = (file) => {
   read(file)
     .then(upperCaseContents)
-    .then(buffer => saveFile(file, buffer))
+    .then(buffer => write(file, buffer))
     .then(() => ok(file))
     .catch(err);
 };
 
-module.exports = alterFile;
+module.exports = alterFile, upperCaseContents;
